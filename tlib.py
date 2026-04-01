@@ -2,7 +2,6 @@ import pimakerlibrary as pimaker
 
 
 if __name__ == "__main__":
-    # pimaker.detect_fingertip(2)
+	pimaker.detect_fingertip()
     # pimaker.open_camera()
-    # pimaker.detect_eyes(5)
-    pimaker.open_canvas()
+    pimaker.detect_eyes()

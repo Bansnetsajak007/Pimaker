@@ -1,7 +1,7 @@
 import cv2
 
-def detect_eyes():
-    """Detect and visualize eyes using OpenCV Haar Cascades."""
+def detect_eyes(target_blinks=None):
+    """Detect and visualize eyes using OpenCV Haar Cascades, with blink counting."""
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
@@ -11,6 +11,11 @@ def detect_eyes():
         raise Exception("Could not open camera")
 
     print("Press 'q' to exit eye detector")
+    if target_blinks:
+        print(f"Goal: Detect {target_blinks} blinks")
+
+    blink_count = 0
+    eyes_closed_frames = 0
 
     while True:
         ret, frame = cap.read()
@@ -25,6 +30,9 @@ def detect_eyes():
         # Detect faces to restrict eye search area (improves accuracy)
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
         
+        face_detected = len(faces) > 0
+        eyes_detected = False
+
         for (x, y, w, h) in faces:
             # Draw a rectangle around the face
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
@@ -35,10 +43,32 @@ def detect_eyes():
             
             # Detect eyes within the face ROI
             eyes = eye_cascade.detectMultiScale(roi_gray, scaleFactor=1.1, minNeighbors=10, minSize=(20, 20))
+            if len(eyes) > 0:
+                eyes_detected = True
+
             for (ex, ey, ew, eh) in eyes:
                 # Draw a rectangle around the eyes
                 cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
                 cv2.putText(roi_color, "Eye", (ex, ey - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        # Blink counting logic
+        if face_detected:
+            if not eyes_detected:
+                eyes_closed_frames += 1
+            else:
+                if eyes_closed_frames >= 2: # At least 2 frames of closed eyes to count as a blink
+                    blink_count += 1
+                    print(f"Blink detected! Total: {blink_count}")
+                eyes_closed_frames = 0
+
+        # Display blink count on screen
+        cv2.putText(frame, f"Blinks: {blink_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        if target_blinks and blink_count >= target_blinks:
+            cv2.putText(frame, "Target Reached!", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.imshow("PiMaker Eye Detection", frame)
+            cv2.waitKey(2000) # Wait 2 seconds so the user can see it
+            print("Target blinks reached. Exiting...")
+            break
 
         cv2.imshow("PiMaker Eye Detection", frame)
 
@@ -47,3 +77,4 @@ def detect_eyes():
 
     cap.release()
     cv2.destroyAllWindows()
+

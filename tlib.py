@@ -2,8 +2,8 @@ import pimakerlibrary as pimaker
 
 
 if __name__ == "__main__":
-    # pimaker.detect_fingertip(show_gesture=True)
-    pimaker.open_camera(cyborg_face=True, laser_eyes=True, skeleton_mirror=True)
+    pimaker.detect_fingertip(show_gesture=True)
+    # pimaker.open_camera(cyborg_face=True, laser_eyes=True, skeleton_mirror=True)
     # pimaker.open_camera(app_filters="dog-removebg-preview")
     # pimaker.detect_eyes()
     # pimaker.open_canvas()

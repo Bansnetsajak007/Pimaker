@@ -47,6 +47,8 @@ def guess_gesture(landmarks):
         return "Peace Sign!"
     if index_open and not middle_open and not ring_open and not pinky_open:
         return "Pointing"
+    if not index_open and middle_open and not ring_open and not pinky_open:
+        return "WARNING: Violence Detected! (Middle Finger)"
     if index_open and middle_open and ring_open and pinky_open:
         return "Open Hand / High Five!"
         

@@ -17,7 +17,7 @@ def _ensure_model_file(package_root):
     return model_path
 
 
-def run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids):
+def run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids, show_gesture=False):
     mp_hands = mp.solutions.hands
     mp_draw = mp.solutions.drawing_utils
 
@@ -48,6 +48,7 @@ def run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids):
                 mp_draw,
                 cv2,
                 selected_tip_ids,
+                show_gesture=show_gesture
             )
 
             cv2.imshow("PiMaker Finger Tip Detection", annotated)
@@ -58,7 +59,7 @@ def run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids):
     cv2.destroyAllWindows()
 
 
-def run_tasks_webcam(cv2, mp, annotate_tasks_frame, selected_tip_ids):
+def run_tasks_webcam(cv2, mp, annotate_tasks_frame, selected_tip_ids, show_gesture=False):
     from mediapipe.tasks import python as mp_python
     from mediapipe.tasks.python import vision
 
@@ -92,7 +93,7 @@ def run_tasks_webcam(cv2, mp, annotate_tasks_frame, selected_tip_ids):
             timestamp_ms = int(time.time() * 1000)
 
             result = landmarker.detect_for_video(mp_image, timestamp_ms)
-            annotated = annotate_tasks_frame(frame, result.hand_landmarks, cv2, selected_tip_ids)
+            annotated = annotate_tasks_frame(frame, result.hand_landmarks, cv2, selected_tip_ids, show_gesture=show_gesture)
 
             cv2.imshow("PiMaker Finger Tip Detection", annotated)
             if cv2.waitKey(1) & 0xFF == ord("q"):

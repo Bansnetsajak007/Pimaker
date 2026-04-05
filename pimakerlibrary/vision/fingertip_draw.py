@@ -26,7 +26,34 @@ def draw_tip_box(frame, x, y, cv2, color=(0, 255, 255), box_size=28):
     cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
 
 
-def annotate_legacy_frame(frame, results, mp_hands, mp_draw, cv2, selected_tip_ids=None):
+import math
+def guess_gesture(landmarks):
+    wrist = landmarks[0]
+    def dist(p1, p2):
+        return math.hypot(p1.x - p2.x, p1.y - p2.y)
+        
+    index_open = dist(landmarks[8], wrist) > dist(landmarks[6], wrist)
+    middle_open = dist(landmarks[12], wrist) > dist(landmarks[10], wrist)
+    ring_open = dist(landmarks[16], wrist) > dist(landmarks[14], wrist)
+    pinky_open = dist(landmarks[20], wrist) > dist(landmarks[18], wrist)
+    
+    thumb_open = dist(landmarks[4], landmarks[17]) > dist(landmarks[3], landmarks[17])
+    
+    if not index_open and not middle_open and not ring_open and not pinky_open:
+        if thumb_open and landmarks[4].y < landmarks[0].y:
+            return "Thumbs Up!"
+        return "Fist"
+    if index_open and middle_open and not ring_open and not pinky_open:
+        return "Peace Sign!"
+    if index_open and not middle_open and not ring_open and not pinky_open:
+        return "Pointing"
+    if index_open and middle_open and ring_open and pinky_open:
+        return "Open Hand / High Five!"
+        
+    return ""
+
+
+def annotate_legacy_frame(frame, results, mp_hands, mp_draw, cv2, selected_tip_ids=None, show_gesture=False):
     if not results.multi_hand_landmarks:
         return frame
 
@@ -35,6 +62,12 @@ def annotate_legacy_frame(frame, results, mp_hands, mp_draw, cv2, selected_tip_i
     h, w, _ = frame.shape
     for hand_landmarks in results.multi_hand_landmarks:
         mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+        
+        if show_gesture:
+            gesture = guess_gesture(hand_landmarks.landmark)
+            if gesture:
+                cv2.putText(frame, gesture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 3)
+                
         for name, tip_id in tip_ids.items():
             tip = hand_landmarks.landmark[tip_id]
             x, y = int(tip.x * w), int(tip.y * h)
@@ -52,7 +85,7 @@ def annotate_legacy_frame(frame, results, mp_hands, mp_draw, cv2, selected_tip_i
     return frame
 
 
-def annotate_tasks_frame(frame, landmarks_per_hand, cv2, selected_tip_ids=None):
+def annotate_tasks_frame(frame, landmarks_per_hand, cv2, selected_tip_ids=None, show_gesture=False):
     if not landmarks_per_hand:
         return frame
 
@@ -68,6 +101,11 @@ def annotate_tasks_frame(frame, landmarks_per_hand, cv2, selected_tip_ids=None):
         for point in landmarks:
             px, py = int(point.x * w), int(point.y * h)
             cv2.circle(frame, (px, py), 3, (255, 100, 0), -1)
+
+        if show_gesture:
+            gesture = guess_gesture(landmarks)
+            if gesture:
+                cv2.putText(frame, gesture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 3)
 
         for name, tip_id in tip_ids.items():
             tip = landmarks[tip_id]

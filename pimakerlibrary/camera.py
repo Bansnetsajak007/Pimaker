@@ -28,13 +28,14 @@ def open_camera():
     cv2.destroyAllWindows()
 
 
-def detect_fingertip(finger=None):
+def detect_fingertip(finger=None, show_gesture=False):
     """Detect fingertips from webcam only.
 
     Args:
         finger: Optional finger selector from 1 to 5.
             1=thumb, 2=index, 3=middle, 4=ring, 5=pinky.
             If omitted, all fingertips are detected.
+        show_gesture: If True, identifies and displays simple gestures (Thumbs up, Peace sign, etc.)
     """
     try:
         import mediapipe as mp
@@ -53,6 +54,6 @@ def detect_fingertip(finger=None):
         selected_tip_ids = {selected_name: FINGERTIP_IDS[selected_name]}
 
     if hasattr(mp, "solutions") and hasattr(mp.solutions, "hands"):
-        run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids)
+        run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids, show_gesture=show_gesture)
     else:
-        run_tasks_webcam(cv2, mp, annotate_tasks_frame, selected_tip_ids)
+        run_tasks_webcam(cv2, mp, annotate_tasks_frame, selected_tip_ids, show_gesture=show_gesture)

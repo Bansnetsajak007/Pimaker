@@ -1,5 +1,11 @@
+# Computer Vision & Image Processing
 opencv-python>=4.8.0
 numpy>=1.24.0
-mediapipe>=0.10.0
+
+# Face, Pose, and Gesture Tracking (Tasks API requires newer versions)
+mediapipe>=0.10.9
+
+# Object Detection & Controls
 ultralytics>=8.0.0
 pyautogui>=0.9.54
+        

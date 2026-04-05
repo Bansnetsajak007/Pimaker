@@ -8,3 +8,13 @@ venv/
 
 # Test/cache artifacts
 .pytest_cache/
+# ML Models
+*.task
+*.onnx
+*.xml
+*.caffemodel
+*.prototxt
+
+# Python Caches
+__pycache__/
+*.py[cod]

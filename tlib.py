@@ -12,5 +12,5 @@ if __name__ == "__main__":
     # pimaker.start_virtual_piano()
     # pimaker.start_face_swap()
     # pimaker.play_rock_paper_scissors()
-    pimaker.play_game("fruit ninja")
-    # pimaker.play_game("balloon pop")
+    # pimaker.play_game("fruit ninja")
+    pimaker.play_game("balloon pop")

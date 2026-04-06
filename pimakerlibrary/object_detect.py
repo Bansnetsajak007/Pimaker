@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
-from ultralytics import YOLO
+
+try:
+    from ultralytics import YOLO
+except ImportError:
+    YOLO = None
 
 # --- Color palette for 80 COCO classes ---
 # Generate distinct, vibrant colors using HSV spacing
@@ -31,6 +35,9 @@ def detect_objects(confidence_threshold=0.5, model_size="n"):
         Q / ESC  -- quit
         +/-      -- raise / lower confidence threshold on the fly
     """
+    if YOLO is None:
+        raise ImportError("ultralytics is required for object detection. Install with: pip install ultralytics")
+
     valid_sizes = ("n", "s", "m", "l", "x")
     if model_size not in valid_sizes:
         raise ValueError(

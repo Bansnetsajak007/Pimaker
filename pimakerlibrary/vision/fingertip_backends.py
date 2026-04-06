@@ -36,7 +36,8 @@ def run_legacy_webcam(cv2, mp, annotate_legacy_frame, selected_tip_ids, show_ges
         while True:
             ret, frame = cap.read()
             if not ret:
-                break
+                print("Failed to grab frame. Retrying...")
+                continue
 
             frame = cv2.flip(frame, 1)
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -82,15 +83,21 @@ def run_tasks_webcam(cv2, mp, annotate_tasks_frame, selected_tip_ids, show_gestu
     with vision.HandLandmarker.create_from_options(options) as landmarker:
         print("Press 'q' to exit fingertip detector")
 
+        last_timestamp_ms = -1
+
         while True:
             ret, frame = cap.read()
             if not ret:
-                break
+                print("Failed to grab frame. Retrying...")
+                continue
 
             frame = cv2.flip(frame, 1)
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
             timestamp_ms = int(time.time() * 1000)
+            if timestamp_ms <= last_timestamp_ms:
+                timestamp_ms = last_timestamp_ms + 1
+            last_timestamp_ms = timestamp_ms
 
             result = landmarker.detect_for_video(mp_image, timestamp_ms)
             annotated = annotate_tasks_frame(frame, result.hand_landmarks, cv2, selected_tip_ids, show_gesture=show_gesture)

@@ -148,12 +148,14 @@ def open_camera(detect_emotion=False, cyborg_face=False, skeleton_mirror=False, 
         emotion_net = cv2.dnn.readNetFromONNX(onnx_path)
         emotion_labels = ['Neutral', 'Happiness', 'Surprise', 'Sadness', 'Anger', 'Disgust', 'Fear', 'Contempt']
 
+    last_timestamp_ms = -1
+
     while True:
         ret, frame = cap.read()
 
         if not ret:
-            print("Failed to grab frame")
-            break
+            print("Failed to grab frame in camera. Retrying...")
+            continue
 
         if (cyborg_face or app_filters or laser_eyes) and face_landmarker or (skeleton_mirror and pose_landmarker):
             import time
@@ -162,6 +164,9 @@ def open_camera(detect_emotion=False, cyborg_face=False, skeleton_mirror=False, 
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
                 timestamp_ms = int(time.time() * 1000)
+                if timestamp_ms <= last_timestamp_ms:
+                    timestamp_ms = last_timestamp_ms + 1
+                last_timestamp_ms = timestamp_ms
                 
                 # CYBORG FACE & APP FILTERS & LASER EYES
                 if (cyborg_face or app_filters or laser_eyes) and face_landmarker:

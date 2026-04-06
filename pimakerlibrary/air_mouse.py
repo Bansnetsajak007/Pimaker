@@ -57,11 +57,14 @@ def start_air_mouse():
     # Reduce pyautogui delay for smoother tracking
     pyautogui.PAUSE = 0
     
+    last_timestamp_ms = -1
+    
     with vision.HandLandmarker.create_from_options(options) as landmarker:
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
-                break
+                print("Failed to grab frame. Retrying...")
+                continue
                 
             # Flip the frame horizontally for a selfie-view display
             frame = cv2.flip(frame, 1)
@@ -70,6 +73,9 @@ def start_air_mouse():
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
             timestamp_ms = int(time.time() * 1000)
+            if timestamp_ms <= last_timestamp_ms:
+                timestamp_ms = last_timestamp_ms + 1
+            last_timestamp_ms = timestamp_ms
             
             result = landmarker.detect_for_video(mp_image, timestamp_ms)
             

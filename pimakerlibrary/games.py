@@ -809,6 +809,9 @@ GAME_REGISTRY = {
     "balloon": _play_balloon_pop,
     "rock paper scissors": None,  # placeholder — actual impl in rock_paper_scissors.py
     "rps": None,
+    "8 ball pool": None, # placeholder -- actual in pool_game.py
+    "8ball": None,
+    "pool": None,
 }
 
 
@@ -820,13 +823,14 @@ def play_game(game_name):
       - "fruit ninja"   — Swipe to slice fruits, avoid bombs!
       - "balloon pop"   — Pop floating balloons before time runs out!
       - "rock paper scissors" — Gesture-based RPS vs the computer!
+      - "8 ball pool"   — Hand-controlled 8-ball pool with physics!
 
     Args:
         game_name (str): Name of the game to play (case-insensitive).
 
     Example:
         pimaker.play_game("fruit ninja")
-        pimaker.play_game("balloon pop")
+        pimaker.play_game("8 ball pool")
     """
     key = game_name.strip().lower()
 
@@ -835,14 +839,19 @@ def play_game(game_name):
         play_rock_paper_scissors()
         return
 
+    if key in ("8 ball pool", "8ball", "pool", "8ball pool"):
+        from .pool_game import _play_8ball_pool
+        _play_8ball_pool()
+        return
+
     game_func = GAME_REGISTRY.get(key)
 
     if game_func is None:
-        available = ["fruit ninja", "balloon pop", "rock paper scissors"]
+        available = ["fruit ninja", "balloon pop", "rock paper scissors", "8 ball pool"]
         raise ValueError(
             f"🎮 Unknown game '{game_name}'!\n"
             f"   Available games: {', '.join(available)}\n"
-            f"   Example: pimaker.play_game(\"fruit ninja\")"
+            f"   Example: pimaker.play_game(\"8 ball pool\")"
         )
 
     game_func()

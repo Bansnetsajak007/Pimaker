@@ -19,4 +19,3 @@ venv/
 __pycache__/ 
 *.py[cod]
 
-tlib.py

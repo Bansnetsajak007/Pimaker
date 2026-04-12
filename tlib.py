@@ -16,4 +16,8 @@ if __name__ == "__main__":
     # pimaker.play_game("balloon pop")
     # pimaker.play_game("8 ball pool")
     # pimaker.start_gesture_controller(mode="presentation")
-    pimaker.start_gesture_controller(mode="media")
+    # pimaker.start_eye_scroller()
+    # pimaker.start_eye_scroller(scroll_speed=8, enable_click=True)
+    # pimaker.start_gesture_controller(mode="media")
+    pimaker.start_eye_scroller()
+
